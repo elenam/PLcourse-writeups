@@ -1,0 +1,47 @@
+\documentclass{article}
+\pagestyle{empty}
+\usepackage{amsmath,amssymb}
+\usepackage{url}
+\usepackage{hyperref}
+
+%% Ideally, I should make this into a file.
+%% But I don't remember how to include the file :-)
+\newcommand{\OR}{ \vee }
+\newcommand{\AND}{ \wedge }
+\newcommand{\IMPL}{ \rightarrow }
+\newcommand{\EQUIV}{ \leftrightarrow }
+\newcommand{\LOGEQ}{<\equiv> }
+\newcommand{\NOT}{\widetilde{}\enspace}
+\newcommand{\lam}{\lambda}
+
+\begin{document}
+
+%{\large\bf Work in pairs}
+
+
+
+\begin{center}
+{\large\bf Introduction to the $\lam$-calculus for CSci 4651}
+\\ 
+{\large\bf Elena Machkasova, UMN Morris}
+\end{center}
+
+\section{Overview}
+\textit{The Lambda Calculus ($\lam$-calculus)} was developed by an American mathematician Alonzo Church in 1930s to study computation. 
+It uses anonymous functions and their composition to represent computation. The $\lam$-calculus has been proven equivalent to 
+the Turning Machine model of computation (invented by Alan Turing in 1936) which includes an infinite tape (modeling computer memory) and a collection of states of the computing device that perform different actions (modeling a program). 
+
+The $\lam$-calculus and its more modern variants and extensions is used to formally define evaluation of a program, and 
+specifically different orders of evaluation, including \textit{call-by-value} and \textit{call-by-name} evaluation strategies that we cover below, 
+as well as \textit{call-by-need} that represents \href{https://en.wikipedia.org/wiki/Lazy_evaluation}{lazy evaluation strategy}, 
+\textit{$\pi$-calculus (pi-calculus)} that represents a distributed system of processes communicating via channels, and many other. 
+
+\section{Syntax}
+
+$\lam$-calculus operates with expressions known as $\lam$-terms that we define below. 
+Even though the classical $\lam$-calculus doesn't directly include numbers, it is possible to define $\lam$-terms 
+that correspond to numbers and define
+arithmetic operations on them. For simplicity we include integer constants directly into expressions in the 
+
+
+\end{document}
