@@ -152,7 +152,7 @@ Based on the definition of a value, we now define CBV $\beta$-reduction. Note th
 
 $M_1 \cbvb M_2$ if one of the following is true:
 \begin{enumerate}
-\item $M_1 = (\lam x. M) N, M_2 = M [ x := N]$, where $M [ x := N]$ stands for $M$ in which all free occurrences of $x$ are replaced by $N$,
+\item $M_1 = (\lam x. M) V, M_2 = M [ x := V]$, where $M [ x := V]$ stands for $M$ in which all free occurrences of $x$ are replaced by $V$. Note that here the argument of the application is restricted to be a value, as defined above. 
 \item $M_1 = MN$, $M_2 = M'N$, and $M \cbvb M'$,
 \item $M_1 = MN$, $M_2 = MN'$, and $N \cbvb N'$,
 \item $M_1 = \lam x. M, M_2 = \lam x. M'$, and $M \cbvb M'$,
@@ -162,11 +162,27 @@ $M_1 \cbvb M_2$ if one of the following is true:
 Just as for CBN, we assume that $\alpha$-renaming is done to avoid variable capture. 
 
 Many, but not all, CBN examples above still work the same in CBV. Let us revisit the examples from above:
-
-
-
+\begin{itemize}
+\item $(\lam x. x + x) 2 \cbvb 2 + 2 \rightarrow 4$. This example works the same in CBV since $2$ is a value (a constant). 
+\item $(\lam x. \lam y. y + x) 2 \cbvb \lam y. y + 2$. This example also works the same, for the same reason. 
+\item  $(\lam x. x + x)((\lam y. y + 1) 5) \cbvb (\lam x. x + x) (5 + 1)$. This works in CBV since we again are applying a function to a constant (a value). The recursive definition allows us to reduce the argument of an application (by case 3, just like in CBN). 
+\item The next example $(\lam x. x + x)((\lam y. y + 1) 5) \cbnb (\lam y. y + 1) 5 + (\lam y. y + 1) 5$ {\bf does not} work in CBV since it's passing an unevaluted argument $(\lam y. y + 1) 5$ to the function. 
+\item $\lam z. (\lam y. y + 2) 1 \cbvb \lam z. 1 + 2 \rightarrow \lam z. 3$ works in CBV since, again, the argument of a function is a constant, and case 4 of the definition allows us to evaluate inside a function. 
+\item $(\lam x. 2 \times x) 5 - (\lam x. x + x) 2 \cbvb (2 \times 5) -  (\lam x. x + x) 2 \cbvb (2 \times 5) - (2 + 2) \rightarrow 10 - 4 \rightarrow 6$ also works the same in CBV. Here we are using cases 5 and 6 of the recursive definition of $\cbvb$.  
+\item The final example of a diverging term $\Omega$ also works in CBV and results in divergence: since $\lam x. xx$ is a function, and functions are values, we can perform the same reduction in CBV as follows:  $(\lam x. xx)(\lam x. xx) \cbvb  (\lam x. xx)(\lam x. xx) \cbvb  (\lam x. xx)(\lam x. xx) \dots$
+\end{itemize}
+As another example of a reduction that works in CBN, but not in CBV, consider $(\lam x. x + x)(5 - 2)$. In CBN it can be evaluated as follows:
+$$
+(\lam x. x + x)(5 - 2) \cbnb (5 - 2) + (5 - 2) \rightarrow 3 + 3 \rightarrow 6. 
+$$
+In CBV you have to evaluate the argument to a value before passing it in to a function:
+$$
+(\lam x. x + x)(5 - 2) \cbvb (\lam x. x + x) 3 \rightarrow 3 + 3 \rightarrow 6. 
+$$
+The results are, of course, the same, but the steps performed are different. See section~\ref{confluence} for more explanations. 
 
 \subsection{Evaluation vs optimization}\label{eval}
+%left-most-outer-most
 
 \subsection{Confluence}\label{confluence}
 
