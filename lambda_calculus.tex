@@ -68,9 +68,23 @@ $\lam y. \lam x.  x + y$. We say that adding $\lam y$  to $\lam x.  x + y$ \text
 
 $\alpha$-equivalence is the same notion as a consistent renaming of local variables in a function or a method in a program or variables in expressions with $\forall$ and $\exists$ quantifiers in predicate calculus. As such, it is a familiar concept, and we omit the formal definition. 
 
+\section{$\beta$-reduction}
+The $\lam$-calculus describes computations in a functional language, so its main operation is a function application, i.e. applying one term to another. This operation is known as \textit{$\beta$-reduction}. There are two main variations of the $\beta$-reduction: \textit{call-by-name}, often abbreviated CBN, and \textit{call-by-value} (CBV). Since this is the main operation that affects the entire system, we distinguish between the CBN $\lam$-calculus and CBV $\lam$-calculus. 
 
+In both cases of the calculi the goal of $\beta$-reduction is to \textit{evaluate} a given term to a \textit{value}, i.e. the final result, or the point where no more evaluation is possible. 
+Strictly speaking, not all final results are values - for example, a computation may end up at an error, like $2 \lam x. x$ (here $2$ is applied to $\lam x. x$, but $2$ is not a function, and therefore cannot be applied, so there is no way to evaluate this term any further). A more general term for the result of a computation that can't be evaluated any further is a \textit{normal form}, and values are ``good'' normal forms. 
+We define a value formally in section~\ref{cbv}. 
 
+Note that in our examples in addition to $\beta$-reduction we are allowed to perform arithmetic operations, such as evaluate $2 + 3$ to $5$. Such operations are allowed in both calculi and work the same way. 
 
+$\beta$-reduction is used for two purposes: as an \textit{evaluation strategy} that defines how a program will be evaluated on the computer, and as an \textit{optimization}, typically thought of as being performed at compilation time to speed up the program. The distinction between the two is that \textit{evaluation strategy} is deterministic: given a term that needs to be evaluated, it will perform steps in a particular order to reach the result. $\beta$-reduction as an optimization, however, could be performed anywhere in a term at any point in a hope of simplifying the term and avoiding more work later. When we study $\beta$-reduction as an optimization, we are concerned with its \textit{correctness}: is it possible that some operations that it performs change the result of evaluation? We discuss these issues more in section~\ref{eval}.
 
+\subsection{CBN $\lam$-calculus}\label{cbn}
+
+\subsection{CBV $\lam$-calculus}\label{cbv}
+
+\subsection{Evaluation vs optimization}\label{eval}
+
+\subsection{Confluence}
 
 \end{document}
