@@ -34,14 +34,32 @@ the Turning Machine model of computation (invented by Alan Turing in 1936) which
 The $\lam$-calculus and its more modern variants and extensions is used to formally define evaluation of a program, and 
 specifically different orders of evaluation, including \textit{call-by-value} and \textit{call-by-name} evaluation strategies that we cover below, 
 as well as \textit{call-by-need} that represents \href{https://en.wikipedia.org/wiki/Lazy_evaluation}{lazy evaluation strategy}, 
-\textit{$\pi$-calculus (pi-calculus)} that represents a distributed system of processes communicating via channels, and many other. 
+\href{https://en.wikipedia.org/wiki/\%CE\%A0-calculus}{\textit{$\pi$-calculus (pi-calculus)}} that represents a distributed system of processes communicating via channels, and many other. 
 
 \section{Syntax}
 
 $\lam$-calculus operates with expressions known as $\lam$-terms that we define below. 
 Even though the classical $\lam$-calculus doesn't directly include numbers, it is possible to define $\lam$-terms 
 that correspond to numbers and define
-arithmetic operations on them. For simplicity we include integer constants directly into expressions in the 
+arithmetic operations on them. For simplicity we include integer constants directly into expressions in the examples. 
+
+The syntax of the $\lam$-calculus is given by a BNF-like notation. Expressions in the $\lam$-calculus are called \textit{terms}, 
+and a term is recursively defined as follows:
+$$
+M ::= x \mid c \mid \lam x. M \mid M_1 M_2,
+$$
+which means that a term $M$ is either a variable (represented by $x$, but other lower-case letters can be used, such as $y,z,u$, etc.), a constant (a number or a boolean or another type, as needed), or $\lam x. M$, where $M$ is a term, or an application of one term to another, denoted $M_1 M_2$. Capital letters, in particular $N, P, Q$, are also used to denote terms. 
+
+$\lam x. M$ represents an anonymous single-parameter function with the parameter $x$ and the body $M$. For example, $\lam x. x$ is the identity function that takes a parameter $x$ and returns it unchanged. There is no way to represent a function with more than one parameters, but you can always ``feed'' the parameters separately, one by one: $\lam x. \lam y. M$ (an approach known as ``currying'').
+
+$M_1 M_2$ stands for applying the term $M_1$ (as  a function) to $M_2$. For example, $(\lam x. x) 5$ stands for applying the identity function to a constant $5$. Note that the scope of the lambda extends as far to the right as possible, so parentheses are needed here since without the parentheses   $\lam x. x~5$ would stand for a function that takes $x$ and returns the result of applying it to $5$. Application is left-associative, so $M_1 M_2M_3$ stands for $(M_1 M_2)M_3$. 
+
+In addition to the operations given in the BNF above I will use arithmetic operations in examples. For instance, $\lam x. x + 5$ represents a function that takes $x$ and returns $x + 5$. 
+
+\section{$\alpha$-equivalence}
+
+
+
 
 
 \end{document}
