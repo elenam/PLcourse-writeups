@@ -13,6 +13,8 @@
 \newcommand{\LOGEQ}{<\equiv> }
 \newcommand{\NOT}{\widetilde{}\enspace}
 \newcommand{\lam}{\lambda}
+\newcommand{\cbnb}{\overset{\beta_{N}}{\rightarrow}}
+\newcommand{\op}{\mbox{\small{op}}}
 
 \begin{document}
 
@@ -34,7 +36,7 @@ the Turning Machine model of computation (invented by Alan Turing in 1936) which
 The $\lam$-calculus and its more modern variants and extensions is used to formally define evaluation of a program, and 
 specifically different orders of evaluation, including \textit{call-by-value} and \textit{call-by-name} evaluation strategies that we cover below, 
 as well as \textit{call-by-need} that represents \href{https://en.wikipedia.org/wiki/Lazy_evaluation}{lazy evaluation strategy}, 
-\href{https://en.wikipedia.org/wiki/\%CE\%A0-calculus}{\textit{$\pi$-calculus (pi-calculus)}} that represents a distributed system of processes communicating via channels, and many other. 
+\href{https://en.wikipedia.org/wiki/\%CE\%A0-calculus}{\textit{$\pi$-calculus (pi-calculus)}} that represents a distributed system of processes communicating via channels, and many other ones that you are welcome to look up if curious. 
 
 \section{Syntax}
 
@@ -80,6 +82,34 @@ Note that in our examples in addition to $\beta$-reduction we are allowed to per
 $\beta$-reduction is used for two purposes: as an \textit{evaluation strategy} that defines how a program will be evaluated on the computer, and as an \textit{optimization}, typically thought of as being performed at compilation time to speed up the program. The distinction between the two is that \textit{evaluation strategy} is deterministic: given a term that needs to be evaluated, it will perform steps in a particular order to reach the result. $\beta$-reduction as an optimization, however, could be performed anywhere in a term at any point in a hope of simplifying the term and avoiding more work later. When we study $\beta$-reduction as an optimization, we are concerned with its \textit{correctness}: is it possible that some operations that it performs change the result of evaluation? We discuss these issues more in section~\ref{eval}.
 
 \subsection{CBN $\lam$-calculus}\label{cbn}
+\textit{CBN $\beta$-reduction} is recursively defined as follows: 
+
+$M_1 \cbnb M_2$ if one of the following is true:
+\begin{enumerate}
+\item $M_1 = (\lam x. M) N, M_2 = M [ x := N]$, where $M [ x := N]$ stands for $M$ in which all free occurrences of $x$ are replaced by $N$,
+\item $M_1 = MN$, $M_2 = M'N$, and $M \cbnb M'$,
+\item $M_1 = MN$, $M_2 = MN'$, and $N \cbnb N'$,
+\item $M_1 = \lam x. M, M_2 = \lam x. M'$, and $M \cbnb M'$.
+\end{enumerate}
+The first case defines the $\beta$-reduction as a function application. The other three cases allow you to perform the reduction anywhere in a term. 
+
+Since we are allowing arithmetic operations (such as $+, \times$, etc.) as a part of the lambda calculus, we will additionally allow the $\beta$-reduction to recursively propagate into operands of an arithmetic operation:  
+
+Additionally, $M_1 \cbnb M_2$ if 
+\begin{enumerate}
+\item $M_1 = M \op N$, $M_2 = M' \op N$, and $M \cbnb M'$ or
+\item $M_1 = M \op N$, $M_2 = M \op N'$, and $N \cbnb N'$,
+\end{enumerate}
+where $\op$ is a binary arithmetic operation. 
+
+We will use $\rightarrow$ to mark a reduction step that is performing an arithmetic operation, and not a $\beta$-reduction.
+
+Consider the following examples:
+\begin{itemize}
+\item $(\lam x. x + x) 2 \cbnb 2 + 2 \rightarrow 4$. In this case we applied the function $\lam x. x + x$ to $2$ by replacing all occurrences of $x$ in the body of the function $x + x$, and then performed the addition to get the value $4$. 
+\item $(\lam x. \lam y. y + x) 2 \cbnb \lam y. y + 2$. Here the result of the function application is a function $\lam y. y + 2$ (a function that adds 2 to its argument).
+\item  
+\end{itemize}
 
 \subsection{CBV $\lam$-calculus}\label{cbv}
 
