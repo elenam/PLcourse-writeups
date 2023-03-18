@@ -93,6 +93,9 @@ $M_1 \cbnb M_2$ if one of the following is true:
 \end{enumerate}
 The first case defines the $\beta$-reduction as a function application. The other three cases allow you to perform the reduction anywhere in a term. 
 
+Note that in order to get the correct result, $M [ x := N]$ would often require parentheses around $N$ as it's being 
+substituted into $M$. See examples below for specifics. 
+
 Since we are allowing arithmetic operations (such as $+, \times$, etc.) as a part of the lambda calculus, we will additionally allow the $\beta$-reduction to recursively propagate into operands of an arithmetic operation:  
 
 Additionally, $M_1 \cbnb M_2$ if 
@@ -108,8 +111,24 @@ Consider the following examples:
 \begin{itemize}
 \item $(\lam x. x + x) 2 \cbnb 2 + 2 \rightarrow 4$. In this case we applied the function $\lam x. x + x$ to $2$ by replacing all occurrences of $x$ in the body of the function $x + x$, and then performed the addition to get the value $4$. 
 \item $(\lam x. \lam y. y + x) 2 \cbnb \lam y. y + 2$. Here the result of the function application is a function $\lam y. y + 2$ (a function that adds 2 to its argument).
-\item  
+\item  $(\lam x. x)((\lam y. y + 1) 5) \cbnb (\lam x. x) (5 + 1)$ In this case the second term in the application gets reduced, corresponding to case 3 of the definition of $\cbnb$ above. The result is not yet a normal form, you can to finish the evaluation on your own.
+\item $\lam z. (\lam y. y + 2) 1 \cbnb \lam z. 1 + 2 \rightarrow \lam z. 3$. Here the $\beta$-reduction is applied inside a function. The final result cannot be reduced any further; it's a function that takes a single argument and returns $3$.
+\item $(\lam x. 2 \times x) 5 - (\lam x. x + x) 2 \cbnb (2 \times 5) -  (\lam x. x + x) 2 \cbnb (2 \times 5) - (2 + 2) \rightarrow 10 - 4 \rightarrow 6$. This example illustrates using $\beta$-reduction together with arithmetic operations. 
 \end{itemize}
+
+There are cases when $(\lam x. M) N \cbnb M [ x := N]$ cannot be applied directly because of a \textit{variable capture}, for example:
+$$
+(\lam x. \lam y.  x y) y
+$$
+Here the substitution would work as following: $(\lam y.  x y) [x := y] = (\lam y. y y)$. Observe that $y$ was free in the given expression and should remain free in the result (presumably since it's a global variable that has some value or meaning in the global context). However, after the substitution $y$ is bound by $\lam y$ and became the same as the function parameter $y$. 
+
+This issue can be resolved using $\alpha$-equivalence. Since the names of local (bound) variables don't matter, we will use a term that's $\alpha$-equivalent to the given one, but doesn't cause variable capture: $(\lam x. \lam z.  x z) y$. The term has the exact same functionality as the original one, but now the substitution is safe:
+$$
+(\lam x. \lam z.  x z) y \cbnb \lam z. y z
+$$
+Here $y$ remains free (global). Replacing a term by an $\alpha$-equivalent one (usually to avoid a free variable capture) is known as \textit{$\alpha$-renaming}.      
+
+For all our examples we assume that $\alpha$-renaming should be used to prevent a variable capture. One possible approach is to always rename all terms in a way that makes all bound names unique and distinct from all free variables names (this is known as the \textit{distinct variables convention}). However, it becomes cumbersome to always rename bound variables in all examples, so we will just require $\alpha$-renaming to prevent variable capture.                                          
 
 \subsection{CBV $\lam$-calculus}\label{cbv}
 
@@ -118,3 +137,4 @@ Consider the following examples:
 \subsection{Confluence}
 
 \end{document}
+	
