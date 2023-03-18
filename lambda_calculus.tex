@@ -14,6 +14,7 @@
 \newcommand{\NOT}{\widetilde{}\enspace}
 \newcommand{\lam}{\lambda}
 \newcommand{\cbnb}{\overset{\beta_{N}}{\rightarrow}}
+\newcommand{\cbvb}{\overset{\beta_{V}}{\rightarrow}}
 \newcommand{\op}{\mbox{\small{op}}}
 
 \begin{document}
@@ -111,9 +112,11 @@ Consider the following examples:
 \begin{itemize}
 \item $(\lam x. x + x) 2 \cbnb 2 + 2 \rightarrow 4$. In this case we applied the function $\lam x. x + x$ to $2$ by replacing all occurrences of $x$ in the body of the function $x + x$, and then performed the addition to get the value $4$. 
 \item $(\lam x. \lam y. y + x) 2 \cbnb \lam y. y + 2$. Here the result of the function application is a function $\lam y. y + 2$ (a function that adds 2 to its argument).
-\item  $(\lam x. x)((\lam y. y + 1) 5) \cbnb (\lam x. x) (5 + 1)$ In this case the second term in the application gets reduced, corresponding to case 3 of the definition of $\cbnb$ above. The result is not yet a normal form, you can to finish the evaluation on your own.
+\item  $(\lam x. x + x)((\lam y. y + 1) 5) \cbnb (\lam x. x + x) (5 + 1)$ In this case the second term in the application gets reduced, corresponding to case 3 of the definition of $\cbnb$ above. The result is not yet a normal form, you can to finish the evaluation on your own.
+\item There may be more than one possibility for a $\beta$-reduction step from the same term. For example, another possible step of  $\beta$-reduction for the term above is $(\lam x. x + x)((\lam y. y + 1) 5) \cbnb (\lam y. y + 1) 5 + (\lam y. y + 1) 5$ (which is also not a normal form).
 \item $\lam z. (\lam y. y + 2) 1 \cbnb \lam z. 1 + 2 \rightarrow \lam z. 3$. Here the $\beta$-reduction is applied inside a function. The final result cannot be reduced any further; it's a function that takes a single argument and returns $3$.
 \item $(\lam x. 2 \times x) 5 - (\lam x. x + x) 2 \cbnb (2 \times 5) -  (\lam x. x + x) 2 \cbnb (2 \times 5) - (2 + 2) \rightarrow 10 - 4 \rightarrow 6$. This example illustrates using $\beta$-reduction together with arithmetic operations. 
+\item Evaluation in the $\lam$-calculus is not guaranteed to stop, it may go on infinitely (similar to an infinite loop in a program). Consider the term $(\lam x. xx)(\lam x. xx)$. In one step of $\beta$-reduction it evaluates to the same term:  $(x x) [x := \lam x. x x]$ is exactly $(\lam x. xx)(\lam x. xx)$. This term is often denoted as $\Omega$. Terms for which evaluation never stops are known as \textit{diverging terms}. 
 \end{itemize}
 
 There are cases when $(\lam x. M) N \cbnb M [ x := N]$ cannot be applied directly because of a \textit{variable capture}, for example:
@@ -131,10 +134,41 @@ Here $y$ remains free (global). Replacing a term by an $\alpha$-equivalent one (
 For all our examples we assume that $\alpha$-renaming should be used to prevent a variable capture. One possible approach is to always rename all terms in a way that makes all bound names unique and distinct from all free variables names (this is known as the \textit{distinct variables convention}). However, it becomes cumbersome to always rename bound variables in all examples, so we will just require $\alpha$-renaming to prevent variable capture.                                          
 
 \subsection{CBV $\lam$-calculus}\label{cbv}
+Consider the following CBN $\beta$-reduction: 
+$$(\lam x. x + x)((\lam y. y + 1) 5) \cbnb (\lam y. y + 1) 5 + (\lam y. y + 1) 5$$
+Here the function $(\lam x. x + x)$ is applied to the argument $(\lam y. y + 1) 5$, and the substitution takes the entire argument and substitutes it into the body of the function as is. However, the argument itself is not fully evaluated. It can be reduced as following: $(\lam y. y + 1) 5 \cbnb 5 + 1 \rightarrow 6$. 
+
+If you were applying a function to an argument in a program, the argument would've been fully evaluated first, and then the resulting value would've been passed to the function.  Only macros take their arguments as is, unevaluated. 
+
+CBN $\lam$-calculus is more suited to representing macros. CBV $\lam$-calculus was specifically designed to represent functions and function calls. It restricts function calls (the base case of the $\beta$-reduction) only to cases when the argument is already a value. 
+
+In order to define CBV $\beta$-reduction, denoted $\cbvb$, we first define a \textit{value}, i.e. a ``good'' final result of evaluation:
+$$
+V ::= x \mid c \mid \lam x. M
+$$
+This means that a value is either a single variable or a constant or a $\lam$-abstraction, i.e. a function $\lam x. M$. Note that this means that a function is a value, which is consistent with the key idea of a functional language: functions are first-class citizens, in particular they can be passed to functions and return from functions. The inclusion of variables as values is more for technical reasons. 
+
+Based on the definition of a value, we now define CBV $\beta$-reduction. Note that only the base case (case 1) changes; all the other cases just recursively allow the reduction to be performed inside terms. We include the cases for arithmetic operations here as well:
+
+$M_1 \cbvb M_2$ if one of the following is true:
+\begin{enumerate}
+\item $M_1 = (\lam x. M) N, M_2 = M [ x := N]$, where $M [ x := N]$ stands for $M$ in which all free occurrences of $x$ are replaced by $N$,
+\item $M_1 = MN$, $M_2 = M'N$, and $M \cbvb M'$,
+\item $M_1 = MN$, $M_2 = MN'$, and $N \cbvb N'$,
+\item $M_1 = \lam x. M, M_2 = \lam x. M'$, and $M \cbvb M'$,
+\item $M_1 = M \op N$, $M_2 = M' \op N$, and $M \cbvb M'$,
+\item $M_1 = M \op N$, $M_2 = M \op N'$, and $N \cbvb N'$,
+\end{enumerate}
+Just as for CBN, we assume that $\alpha$-renaming is done to avoid variable capture. 
+
+Many, but not all, CBN examples above still work the same in CBV. Let us revisit the examples from above:
+
+
+
 
 \subsection{Evaluation vs optimization}\label{eval}
 
-\subsection{Confluence}
+\subsection{Confluence}\label{confluence}
 
 \end{document}
 	
