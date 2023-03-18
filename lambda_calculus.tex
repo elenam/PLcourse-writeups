@@ -71,7 +71,7 @@ $\lam y. \lam x.  x + y$. We say that adding $\lam y$  to $\lam x.  x + y$ \text
 
 $\alpha$-equivalence is the same notion as a consistent renaming of local variables in a function or a method in a program or variables in expressions with $\forall$ and $\exists$ quantifiers in predicate calculus. As such, it is a familiar concept, and we omit the formal definition. 
 
-\section{$\beta$-reduction}
+\section{$\beta$-reduction}\label{beta-intro}
 The $\lam$-calculus describes computations in a functional language, so its main operation is a function application, i.e. applying one term to another. This operation is known as \textit{$\beta$-reduction}. There are two main variations of the $\beta$-reduction: \textit{call-by-name}, often abbreviated CBN, and \textit{call-by-value} (CBV). Since this is the main operation that affects the entire system, we distinguish between the CBN $\lam$-calculus and CBV $\lam$-calculus. 
 
 In both cases of the calculi the goal of $\beta$-reduction is to \textit{evaluate} a given term to a \textit{value}, i.e. the final result, or the point where no more evaluation is possible. 
@@ -182,7 +182,13 @@ $$
 The results are, of course, the same, but the steps performed are different. See section~\ref{confluence} for more explanations. 
 
 \subsection{Evaluation vs optimization}\label{eval}
-%left-most-outer-most
+Recall that in the beginning of section~\ref{beta-intro} we mentioned that $\beta$-reduction can be used as a program evaluation or as a compiler optimization. The difference between the two is that program evaluation is \textit{deterministic}, i.e. given a term evaluation will always perform the same sequence of steps to get it to a normal form, if possible (or go into the same divergence patterns if the term diverges). An optimization may be performed anywhere in a term in a hope of simplifying it and eliminating work done by evaluation at ``run time''. 
+
+Evaluation is also known as \textit{operational semantics} of a calculus since ``semantics'' means ``meaning'', and the meaning of a term is given by what it eventually evaluates to, so operational semantics is a set of rules to find the meaning of terms. 
+
+For both CBN and CBV $\lam$-calculi evaluation is defined as follows: if there is more than one reduction step available (either $\beta$-reduction or an arithmetic operation), perform the \textit{left-most outer-most} one. It is also often the rule that if the only remaining reductions are \textit{under a lambda}, they are \textit{not performed} - we will follow this rule. 
+
+
 
 \subsection{Confluence}\label{confluence}
 
