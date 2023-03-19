@@ -1,25 +1,17 @@
 \documentclass{article}
 \pagestyle{empty}
 \usepackage{amsmath,amssymb}
+\usepackage{amsthm}
 \usepackage{url}
 \usepackage{hyperref}
 
-%% Ideally, I should make this into a file.
-%% But I don't remember how to include the file :-)
-\newcommand{\OR}{ \vee }
-\newcommand{\AND}{ \wedge }
-\newcommand{\IMPL}{ \rightarrow }
-\newcommand{\EQUIV}{ \leftrightarrow }
-\newcommand{\LOGEQ}{<\equiv> }
-\newcommand{\NOT}{\widetilde{}\enspace}
 \newcommand{\lam}{\lambda}
 \newcommand{\cbnb}{\overset{\beta_{N}}{\rightarrow}}
 \newcommand{\cbvb}{\overset{\beta_{V}}{\rightarrow}}
 \newcommand{\op}{\mbox{\small{op}}}
+\newtheorem*{theorem}{Theorem}
 
 \begin{document}
-
-%{\large\bf Work in pairs}
 
 
 
@@ -135,8 +127,8 @@ For all our examples we assume that $\alpha$-renaming should be used to prevent 
 
 \subsection{CBV $\lam$-calculus}\label{cbv}
 Consider the following CBN $\beta$-reduction: 
-$$(\lam x. x + x)((\lam y. y + 1) 5) \cbnb (\lam y. y + 1) 5 + (\lam y. y + 1) 5$$
-Here the function $(\lam x. x + x)$ is applied to the argument $(\lam y. y + 1) 5$, and the substitution takes the entire argument and substitutes it into the body of the function as is. However, the argument itself is not fully evaluated. It can be reduced as following: $(\lam y. y + 1) 5 \cbnb 5 + 1 \rightarrow 6$. 
+$$(\lam x. x + x)((\lam y. y + 1) 5) \cbnb ((\lam y. y + 1) 5) + ((\lam y. y + 1) 5)$$
+Here the function $(\lam x. x + x)$ is applied to the argument $(\lam y. y + 1) 5$, and the substitution takes the entire argument and substitutes it into the body of the function as is. However, the argument itself is not fully evaluated. It can be reduced as following: $(\lam y. y + 1) 5 \cbnb 5 + 1 \rightarrow 12$. 
 
 If you were applying a function to an argument in a program, the argument would've been fully evaluated first, and then the resulting value would've been passed to the function.  Only macros take their arguments as is, unevaluated. 
 
@@ -186,13 +178,35 @@ Recall that in the beginning of section~\ref{beta-intro} we mentioned that $\bet
 
 Evaluation is also known as \textit{operational semantics} of a calculus since ``semantics'' means ``meaning'', and the meaning of a term is given by what it eventually evaluates to, so operational semantics is a set of rules to find the meaning of terms. 
 
-For both CBN and CBV $\lam$-calculi evaluation is defined as follows: if there is more than one reduction step available (either $\beta$-reduction or an arithmetic operation), perform the \textit{left-most outer-most} one. It is also often the rule that if the only remaining reductions are \textit{under a lambda}, they are \textit{not performed} - we will follow this rule. 
+For both CBN and CBV $\lam$-calculi evaluation is defined as follows: if there is more than one reduction step available (either $\beta$-reduction or an arithmetic operation), perform the \textit{leftmost outermost} one. This rule resolves both possible ambiguities: if one step's term is \textit{included inside} the other one's term, the \textit{outermost} one takes precedence; if two terms \textit{don't overlap}, perform the step to the \textit{left}. It is also often the rule that if the only remaining reductions are \textit{under a lambda}, they are \textit{not performed} - we will follow this rule. 
 
-TBD
+Evaluation rules specify which step to perform, which leads to differences in evaluation for CBN and CBV calculi. For example, 
+consider the term $(\lam x. x + x)((\lam y. y + 1) 5)$. There are two possible $\beta$-reduction steps in CBN: applying the first function $\lam x. x + x$ to its argument $(\lam y. y + 1) 5$ and evaluating the argument itself. The evaluation strategy requires that the \textit{outermost} step is performed, so $(\lam x. x + x)((\lam y. y + 1) 5)$ is reduced. Then there are two options for reduction, and the leftmost one is performed first. The evaluation is completed by performing the arithmetic operations left-to-right:
+\begin{align*}
+& (\lam x. x + x)((\lam y. y + 1) 5) \cbnb ((\lam y. y + 1) 5) + ((\lam y. y + 1) 5) \cbnb \\
+& 5 + 1 + ((\lam y. y + 1) 5) \cbnb 5 + 1 + 5 + 1 \rightarrow \dots  12
+\end{align*}
+This term evaluates differently in CBV since $(\lam y. y + 1) 5$ is not a value, and therefore the outer term cannot be reduced by a $\beta$-reduction. There is only one choice in CBV calculus, and that is evaluating $(\lam y. y + 1) 5$. Only after it becomes a value, the outer term is reduced:
+\begin{align*}
+& (\lam x. x + x)((\lam y. y + 1) 5) \cbvb (\lam x. x + x)(5 + 1) \rightarrow  (\lam x. x + x)6 \cbvb \\
+& 6 + 6 \rightarrow 12
+\end{align*}
+
+Note that $\beta$-reduction as an optimization step doesn't have restrictions on where it can be performed. This means that the CBV reduction can be applied in CBN as an optimization (although not the other way around since there is no way to perform the first CBN reduction in CBV). 
 
 \subsection{Confluence}\label{confluence}
+Both $\lam$-calculi have the confluence property. We will formulate this property for the CBN $\lam$-calculus, you can rewrite it for the CBV $\lam$-calculus by replacing $\cbnb$ by $\cbvb$.
 
-TBD
+\begin{theorem}[Confluence of the CBN $\lam$-calculus.]
+If $M$ evaluates to $M_1$ in $n_1 \geq 0$ steps of $\cbnb$ and $M$ evaluates to $M_2$ in $n_2 \geq 0$ steps of $\cbnb$, then 
+there exists a term $N$ such that $M_1$ evaluates to $N$ in $n_3 \geq 0$ of $\cbnb$ and $M_2$ evaluates to $N$ in $n_4 \geq 0$ of $\cbnb$.
+\end{theorem}
+
+This theorem implies that any optimizations done by $\beta$-reduction are \textit{correct}, i.e. they do not change the final result of any computation (to see this, assume that $M \cbnb \dots M_1 \cbnb \dots N$ is the evaluation, and $N$ is its final result; $M \cbnb \dots M_2$ is an optimization).
+
+Since all CBV steps are also valid steps in CBN, this shows that if both CBV and CBN arrive at a normal form, that normal form is the same.  
+
+Note that there may be cases when CBV doesn't arrive at a normal form, but CBN does. Consider, for example, the term $(\lam x. 5)\Omega$, where $\Omega$ is the diverging term defined in section~\ref{cbn}. 
 
 \end{document}
 	
