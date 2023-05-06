@@ -128,7 +128,7 @@ For all our examples we assume that $\alpha$-renaming should be used to prevent 
 \subsection{CBV $\lam$-calculus}\label{cbv}
 Consider the following CBN $\beta$-reduction: 
 $$(\lam x. x + x)((\lam y. y + 1) 5) \cbnb ((\lam y. y + 1) 5) + ((\lam y. y + 1) 5)$$
-Here the function $(\lam x. x + x)$ is applied to the argument $(\lam y. y + 1) 5$, and the substitution takes the entire argument and substitutes it into the body of the function as is. However, the argument itself is not fully evaluated. It can be reduced as following: $(\lam y. y + 1) 5 \cbnb 5 + 1 \rightarrow 12$. 
+Here the function $(\lam x. x + x)$ is applied to the argument $(\lam y. y + 1) 5$, and the substitution takes the entire argument and substitutes it into the body of the function as is. However, the argument itself is not fully evaluated. It can be reduced as following: $(\lam y. y + 1) 5 \cbnb 5 + 1 \rightarrow 6$. 
 
 If you were applying a function to an argument in a program, the argument would've been fully evaluated first, and then the resulting value would've been passed to the function.  Only macros take their arguments as is, unevaluated. 
 
